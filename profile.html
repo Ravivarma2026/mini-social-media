@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Profile</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<style>
+    body {
+    margin: 0;
+    display: flex;
+    font-family: Arial, sans-serif;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 220px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    background: rgba(0,0,0,0.3);
+    padding: 20px;
+}
+
+/* MAIN CONTENT */
+.main {
+    margin-left: 240px; /* IMPORTANT: pushes content right */
+    width: calc(100% - 240px);
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* center horizontally */
+    padding: 20px;
+}
+
+/* CARDS */
+.card {
+    width: 60%;
+    max-width: 500px;
+    background: rgba(255,255,255,0.1);
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 15px;
+    text-align: center;
+}
+</style>
+<body>
+
+<div class="sidebar">
+    <h2>Spidyzz😍</h2>
+    <a href="home.html">Home</a><br><br>
+    <a href="search.html">Search</a><br><br>
+    <a href="reels.html">Reels</a><br><br>
+    <a href="message.html">Messages</a><br><br>
+    <a href="profile.html">Profile</a><br><br>
+</div>
+
+<div class="main">
+
+    <!-- PROFILE CARD -->
+    <div class="card">
+        <h2 id="displayName">User 👤</h2>
+        <img id="profileImage" width="400" style="border-radius:100%; margin-top:10px;">
+        <p>Posts: 10</p>
+        <p>Followers: 250</p>
+    </div>
+
+    <!-- EDIT PROFILE -->
+    <div class="card">
+        <h3>Edit Profile</h3>
+
+        <input type="text" id="editName" placeholder="Enter new name"><br>
+        <button onclick="updateName()">Update</button>
+
+        <br><br>
+
+        <input type="file" onchange="changePhoto(event)"><br><br>
+
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <!-- UPLOAD POST / REEL (ONLY HERE) -->
+    <div class="card">
+        <h3>Create Post / Reel</h3>
+
+        <input type="file" id="postFile"><br><br>
+        <input type="text" id="caption" placeholder="Write caption"><br><br>
+
+        <button onclick="uploadPost()">Upload</button>
+    </div>
+
+</div>
+
+<button onclick="updateProfile()">Save Changes</button>
+<script>
+
+// ================= USER =================
+let name = localStorage.getItem("username");
+let photo = localStorage.getItem("profilePic");
+
+if(!name){
+    window.location.href = "login.html";
+}
+
+document.getElementById("displayName").innerText = name + " 👤";
+document.getElementById("profileImage").src = photo || "https://via.placeholder.com/100";
+
+// ================= UPDATE NAME =================
+function updateName(){
+    let newName = document.getElementById("editName").value;
+
+    if(newName.trim() === "") return;
+
+    localStorage.setItem("username", newName);
+    document.getElementById("displayName").innerText = newName + " 👤";
+}
+
+// ================= CHANGE PHOTO =================
+function changePhoto(event){
+    let file = event.target.files[0];
+    let reader = new FileReader();
+
+    reader.onload = function(){
+        localStorage.setItem("profilePic", reader.result);
+        document.getElementById("profileImage").src = reader.result;
+    }
+
+    reader.readAsDataURL(file);
+}
+
+// ================= UPLOAD POST =================
+async function uploadPost(){
+    let file = document.getElementById("postFile").files[0];
+    let caption = document.getElementById("caption").value;
+
+    if(!file){
+        alert("Select file");
+        return;
+    }
+
+    let reader = new FileReader();
+
+    reader.onload = async function(){
+
+        await fetch("http://localhost:5000/api/posts", {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({
+                userId: localStorage.getItem("userId"),
+                username: localStorage.getItem("username"),
+                media: reader.result,
+                type: file.type.startsWith("video") ? "video" : "image",
+                caption: caption
+            })
+        });
+
+        alert("Uploaded Successfully 🎉");
+
+        document.getElementById("caption").value = "";
+        document.getElementById("postFile").value = "";
+    };
+
+    reader.readAsDataURL(file);
+}
+
+// ================= LOGOUT =================
+function logout(){
+    localStorage.clear();
+    window.location.href = "ravi.html";
+}
+
+</script>
+
+</body>
+</html>
