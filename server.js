@@ -31,7 +31,15 @@ let messages = [];
 
 // ================= TEST ROUTE =================
 app.get("/", (req, res) => {
-    res.send("✅ API Server Running");
+    res.send(`
+        <h1>Mini Social Media 🚀</h1>
+        <p>Backend is working!</p>
+        <p>Use API endpoints like:</p>
+        <ul>
+            <li>/api/register</li>
+            <li>/api/login</li>
+        </ul>
+    `);
 });
 
 // ================= REGISTER =================
