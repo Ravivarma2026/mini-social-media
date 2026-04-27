@@ -6,6 +6,7 @@ const bcrypt = require("bcryptjs");
 const app = express();
 
 // ================= MIDDLEWARE =================
+app.use(express.static("public"));
 app.use(cors());
 app.use(express.json());
 
