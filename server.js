@@ -4,7 +4,8 @@ const cors = require("cors");
 const bcrypt = require("bcryptjs");
 
 const app = express();
-
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log("Server running"));
 // ================= MIDDLEWARE =================
 app.use(cors());
 app.use(express.json());
