@@ -4,20 +4,17 @@ const cors = require("cors");
 const bcrypt = require("bcryptjs");
 
 const app = express();
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log("Server running"));
+
 // ================= MIDDLEWARE =================
 app.use(cors());
 app.use(express.json());
 
 // ================= DATABASE =================
-// 🔥 Replace with MongoDB Atlas URL when deploying
-const MONGO_URL = "mongodb://127.0.0.1:27017/spidyzz";
+const MONGO_URL = process.env.MONGO_URL;
 
 mongoose.connect(MONGO_URL)
 .then(() => console.log("✅ MongoDB Connected"))
 .catch(err => console.error("❌ DB Error:", err));
-
 
 // ================= USER MODEL =================
 const User = mongoose.model("User", {
@@ -29,12 +26,16 @@ const User = mongoose.model("User", {
     following: { type: [String], default: [] }
 });
 
+// ================= MEMORY CHAT =================
+let messages = [];
 
-/// ================= REGISTER =================
+// ================= TEST ROUTE =================
+app.get("/", (req, res) => {
+    res.send("✅ API Server Running");
+});
+
+// ================= REGISTER =================
 app.post("/api/register", async (req, res) => {
-    console.log("🔥 Register API HIT");
-    console.log("DATA:", req.body);
-
     try {
         const { fullname, username, password } = req.body;
 
@@ -49,50 +50,41 @@ app.post("/api/register", async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const newUser = new User({
+        await User.create({
             fullname,
             username,
             password: hashedPassword
         });
 
-        await newUser.save();
-
-        console.log("✅ User saved!");
-
-        res.json({ message: "Registered successfully" });
+        res.json({ message: "Registered successfully ✅" });
 
     } catch (err) {
-        console.error("❌ ERROR:", err);
+        console.error(err);
         res.status(500).json({ message: "Server error" });
     }
 });
-
 
 // ================= LOGIN =================
 app.post("/api/login", async (req, res) => {
     try {
         const { username, password } = req.body;
 
-        // check fields
         if (!username || !password) {
             return res.status(400).json({ message: "Enter username & password" });
         }
 
-        // find user
         const user = await User.findOne({ username });
         if (!user) {
             return res.status(400).json({ message: "User not found" });
         }
 
-        // compare password
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(400).json({ message: "Wrong password" });
         }
 
-        // success
         res.json({
-            message: "✅ Login success",
+            message: "Login success ✅",
             user: {
                 id: user._id,
                 username: user.username,
@@ -107,7 +99,7 @@ app.post("/api/login", async (req, res) => {
     }
 });
 
-// memory DB
+// ================= SEND MESSAGE =================
 app.post("/api/messages", (req, res) => {
     const { sender, receiver, text } = req.body;
 
@@ -116,7 +108,6 @@ app.post("/api/messages", (req, res) => {
     }
 
     const newMsg = { sender, receiver, text };
-
     messages.push(newMsg);
 
     console.log("📩 New Message:", newMsg);
@@ -124,21 +115,7 @@ app.post("/api/messages", (req, res) => {
     res.json({ success: true });
 });
 
-/* ---------------- TEST ROUTE ---------------- */
-app.get("/", (req, res) => {
-    res.send("Server is working");
-});
-
-/* ---------------- SEND MESSAGE ---------------- */
-app.post("/api/messages", (req, res) => {
-    const { sender, receiver, text } = req.body;
-
-    messages.push({ sender, receiver, text });
-
-    res.json({ success: true, messages });
-});
-
-/* ---------------- GET MESSAGES ---------------- */
+// ================= GET MESSAGES =================
 app.get("/api/messages/:me/:user", (req, res) => {
     const { me, user } = req.params;
 
@@ -150,7 +127,9 @@ app.get("/api/messages/:me/:user", (req, res) => {
     res.json(chat);
 });
 
-/* ---------------- START SERVER ---------------- */
-app.listen(5000, () => {
-    console.log("Server running on http://localhost:5000");
+// ================= START SERVER =================
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
 });
