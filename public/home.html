@@ -205,7 +205,7 @@ async function uploadPost(){
     let reader = new FileReader();
 
     reader.onload = async function(){
-        let res = await fetch("http://localhost:5000/api/posts", {
+        let res = await fetch("https://mini-social-media-08pz.onrender.com/api/posts", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({
@@ -228,7 +228,7 @@ async function uploadPost(){
 
 <script>
 async function loadPosts(){
-    let res = await fetch("http://localhost:5000/api/posts");
+    let res = await fetch("https://mini-social-media-08pz.onrender.com/api/posts");
     let posts = await res.json();
 
     let feed = document.getElementById("feed");
@@ -257,7 +257,7 @@ async function updateProfile(){
     let newName = document.getElementById("name").value;
     let newUsername = document.getElementById("username").value;
 
-    let res = await fetch(`http://localhost:5000/api/user/${userId}`, {
+    let res = await fetch(`https://mini-social-media-08pz.onrender.com/api/user/${userId}`, {
         method: "PUT",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
@@ -275,7 +275,7 @@ async function updateProfile(){
 async function loadUser(){
     let userId = localStorage.getItem("userId");
 
-    let res = await fetch(`http://localhost:5000/api/user/${userId}`);
+    let res = await fetch(`https://mini-social-media-08pz.onrender.com/api/user/${userId}`);
     let user = await res.json();
 
     document.getElementById("name").value = user.fullname;

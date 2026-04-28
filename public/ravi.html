@@ -185,7 +185,7 @@ async function login(){
     console.log("Sending:", username, password);
 
     try {
-        let res = await fetch("http://localhost:5000/api/login", {
+        let res = await fetch("https://mini-social-media-08pz.onrender.com/api/login", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({ username, password })
