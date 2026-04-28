@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+<!-- KEEP ALL YOUR EXISTING DESIGN -->
 
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Register - Spidyzz</title>
-
+<title>Ultra Attractive Login</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
@@ -125,22 +125,14 @@ button:hover{
 }
 
 </style>
-
 </head>
 
 <body>
 
 <div class="container">
-    <h2>Create Account</h2>
-
-```
-<form onsubmit="return registerUser()">
-
-    <div class="inputBox">
-        <input type="text" id="fullname" required>
-        <label>Full Name</label>
-    </div>
-
+    <h1>Spidyzz😍</h1>
+    <h2>Login</h2>
+    <form onsubmit="return login()" >
     <div class="inputBox">
         <input type="text" id="username" required>
         <label>Username</label>
@@ -151,38 +143,87 @@ button:hover{
         <label>Password</label>
     </div>
 
-    <button type="submit">Register</button>
+    <button type="button" onclick="login()">Login</button>
 
     <div class="extra">
-        Already have an account? <a href="ravi.html">Login</a>
+        <p>Don't have an account? <a href="register.html">Register</a></p>
     </div>
-
 </form>
+</div>
 
+<!-- Bubbles -->
 <script>
-async function registerUser(){
-    let fullname = document.getElementById("fullname").value;
+function createBubbles(){
+    for(let i=0;i<15;i++){
+        let bubble=document.createElement('div');
+        bubble.classList.add('bubble');
+        bubble.style.left=Math.random()*100+'%';
+        bubble.style.animationDuration=(5+Math.random()*5)+'s';
+        bubble.style.width=bubble.style.height=(20+Math.random()*40)+'px';
+        document.body.appendChild(bubble);
+    }
+}
+createBubbles();
+
+function createBubbles(){
+    for(let i=0;i<15;i++){
+        let bubble=document.createElement('div');
+        bubble.classList.add('bubble');
+        bubble.style.left=Math.random()*100+'%';
+        bubble.style.animationDuration=(5+Math.random()*5)+'s';
+        bubble.style.width=bubble.style.height=(20+Math.random()*40)+'px';
+        document.body.appendChild(bubble);
+    }
+}
+createBubbles();
+
+
+async function login(){
     let username = document.getElementById("username").value;
     let password = document.getElementById("password").value;
 
-    let res = await fetch("http://localhost:5000/api/register", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({fullname, username, password})
-    });
+    console.log("Sending:", username, password);
 
-    let data = await res.text();
+    try {
+        let res = await fetch("http://localhost:5000/api/login", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ username, password })
+        });
 
-    alert(data);
+        console.log("Status:", res.status);
 
-    if(res.ok){
-        window.location.href = "ravi.html";
+        // 🔥 SAFE PARSE
+        let text = await res.text();
+        console.log("Raw response:", text);
+
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch {
+            alert("Server returned invalid data");
+            return false;
+        }
+
+        if(res.ok){
+            localStorage.setItem("userId", data.user.id);
+            localStorage.setItem("username", data.user.username);
+
+            // ✅ FIRST TEST REDIRECT
+            window.location.href = "home.html";
+
+        } else {
+            alert(data.message);
+        }
+
+    } catch(err){
+        console.error("FETCH ERROR:", err);
+        alert("Cannot connect to server");
     }
 
     return false;
 }
-
 </script>
-
+<link rel="stylesheet" href="style.css">
 </body>
 </html>
