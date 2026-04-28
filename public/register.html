@@ -164,7 +164,7 @@ async function registerUser(){
     let username = document.getElementById("username").value;
     let password = document.getElementById("password").value;
 
-    let res = await fetch("http://localhost:5000/api/register", {
+    let res = await fetch("https://mini-social-media-08pz.onrender.com/register", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({fullname, username, password})
