@@ -45,7 +45,7 @@ app.get("/api/posts", (req, res) => {
 
 // ================= HOME ROUTE =================
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "index.html"));
+    res.sendFile(path.join(__dirname, "public", "register.html"));
 });
 
 // ================= REGISTER =================
