@@ -1,38 +1,45 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
+const BASE_URL = "https://mini-social-media-08pz.onrender.com";
+
 function App() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
   const [posts, setPosts] = useState([]);
 
-  // GET POSTS
+  // ================= GET POSTS =================
   useEffect(() => {
-    axios.get("http://localhost:5000/api/posts")
+    axios.get(`${BASE_URL}/api/posts`)
       .then(res => {
         setPosts(res.data);
       })
-      .catch(err => console.log(err));
+      .catch(err => {
+        console.log("Posts error:", err);
+      });
   }, []);
 
-  // LOGIN
-  const login = () => {
-    axios.post("http://localhost:5000/api/login", {
-      username,
-      password
-    })
-    .then(res => {
+  // ================= LOGIN =================
+  const login = async () => {
+    try {
+      const res = await axios.post(`${BASE_URL}/api/login`, {
+        username,
+        password
+      });
+
       console.log("Login Success:", res.data);
-      setUser(res.data);
-    })
-    .catch(err => {
+
+      // ✅ FIX: store only user
+      setUser(res.data.user);
+
+    } catch (err) {
       console.log(err.response?.data);
-      alert("Login failed");
-    });
+      alert(err.response?.data?.message || "Login failed");
+    }
   };
 
-  // LOGOUT
+  // ================= LOGOUT =================
   const logout = () => {
     setUser(null);
     setUsername("");
@@ -76,12 +83,16 @@ function App() {
       {/* POSTS */}
       <h2>Posts</h2>
 
-      {posts.map((post, index) => (
-        <div key={index} style={{ marginBottom: 10 }}>
-          <p><b>{post.username}</b></p>
-          <p>{post.caption}</p>
-        </div>
-      ))}
+      {posts.length === 0 ? (
+        <p>No posts available</p>
+      ) : (
+        posts.map((post, index) => (
+          <div key={index} style={{ marginBottom: 10 }}>
+            <p><b>{post.username}</b></p>
+            <p>{post.caption}</p>
+          </div>
+        ))
+      )}
 
     </div>
   );

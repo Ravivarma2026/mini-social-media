@@ -183,44 +183,32 @@ function like(btn){
 }
 </script>
 <script>
+// 🔥 FIXED LOGIN CHECK
 let name = localStorage.getItem("username");
-let photo = localStorage.getItem("profilePic");
 
 if(!name){
     window.location.href = "login.html";
 }
 
-// SET STORY
-document.getElementById("storyName").innerText = name;
-document.getElementById("storyPic").src = photo;
+// SHOW USER
+document.getElementById("welcome").innerText = "Welcome " + name;
 
-// LIKE BUTTON
-function like(btn){
-    btn.innerHTML = "💖 Liked";
-}
-async function uploadPost(){
-    let file = document.getElementById("postFile").files[0];
-    let caption = document.getElementById("caption").value;
+// 🔥 FIXED API URL (NO localhost)
+async function loadPosts(){
+    let res = await fetch("https://mini-social-media-08pz.onrender.com/api/posts");
+    let posts = await res.json();
 
-    let reader = new FileReader();
+    let feed = document.getElementById("feed");
+    feed.innerHTML = "";
 
-    reader.onload = async function(){
-        let res = await fetch("http://localhost:5000/api/posts", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({
-                userId: localStorage.getItem("userId"),
-                username: localStorage.getItem("username"),
-                media: reader.result,
-                type: file.type.startsWith("video") ? "video" : "image",
-                caption: caption
-            })
-        });
-
-        loadPosts();
-    };
-
-    reader.readAsDataURL(file);
+    posts.forEach(post => {
+        feed.innerHTML += `
+        <div class="post">
+            <h4>${post.username}</h4>
+            <p>${post.caption}</p>
+        </div>
+        `;
+    });
 }
 </script>
 <link rel="stylesheet" href="style.css">

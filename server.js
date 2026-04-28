@@ -2,15 +2,19 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const bcrypt = require("bcryptjs");
+const path = require("path");
 
 const app = express();
 
 // ================= MIDDLEWARE =================
-app.use(express.static("public"));
 app.use(cors());
 app.use(express.json());
 
+// Serve frontend (public folder)
+app.use(express.static(path.join(__dirname, "public")));
+
 // ================= DATABASE =================
+// ❗ Use ENV variable (important for Render)
 const MONGO_URL = process.env.MONGO_URL;
 
 mongoose.connect(MONGO_URL)
@@ -28,19 +32,20 @@ const User = mongoose.model("User", {
 });
 
 // ================= MEMORY CHAT =================
+// ⚠️ This will reset when server restarts (normal in free hosting)
 let messages = [];
 
-// ================= TEST ROUTE =================
+//post
+app.get("/api/posts", (req, res) => {
+    res.json([
+        { username: "john", caption: "Hello world 🌍" },
+        { username: "alice", caption: "My first post 🚀" }
+    ]);
+});
+
+// ================= HOME ROUTE =================
 app.get("/", (req, res) => {
-    res.send(`
-        <h1>Mini Social Media 🚀</h1>
-        <p>Backend is working!</p>
-        <p>Use API endpoints like:</p>
-        <ul>
-            <li>/api/register</li>
-            <li>/api/login</li>
-        </ul>
-    `);
+    res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // ================= REGISTER =================
@@ -119,8 +124,6 @@ app.post("/api/messages", (req, res) => {
     const newMsg = { sender, receiver, text };
     messages.push(newMsg);
 
-    console.log("📩 New Message:", newMsg);
-
     res.json({ success: true });
 });
 
@@ -142,5 +145,3 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
 });
-const path = require("path");
-app.use(express.static(path.join(__dirname, "public")));
